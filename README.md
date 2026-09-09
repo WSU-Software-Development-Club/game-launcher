@@ -59,8 +59,8 @@ FirstName/feature-name
  
 Examples:
 ```
-Anrew/setup
-Amrew/fix-launcher-crash
+Andrew/setup
+Andrew/fix-launcher-crash
 ```
  
 ## Notes
