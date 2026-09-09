@@ -1,0 +1,69 @@
+name: Build Launcher
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Build Launcher on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+
+      - name: Install aqtinstall
+        run: pip install aqtinstall
+
+      - name: Install Linux Qt build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgl1-mesa-dev \
+            libxkbcommon-dev \
+            libxcb-cursor0 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-shape0 \
+            libxcb-xinerama0
+
+      - name: Configure
+        run: cmake -S launcher -B launcher/build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build launcher/build --config Release
+
+      - name: Stage build output
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            cp -r launcher/build/Release/. dist/
+          else
+            find launcher/build -maxdepth 1 -type f -perm -u+x -exec cp {} dist/ \;
+            find launcher/build -maxdepth 1 -name "*.app" -exec cp -r {} dist/ \;
+          fi
+
+      - name: Upload build artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v7
+        with:
+          name: launcher-${{ matrix.os }}
+          path: dist
+          retention-days: 14
