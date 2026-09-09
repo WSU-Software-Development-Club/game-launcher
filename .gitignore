@@ -1,0 +1,10 @@
+# CMake build output
+build/
+
+# Downloaded Qt (each dev/CI pulls their own)
+third_party/
+aqtinstall.log
+
+# Visual Studio / MSVC cruft
+.vs/
+*.vcxproj.user
