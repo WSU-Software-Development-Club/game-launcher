@@ -54,7 +54,11 @@ list(PREPEND CMAKE_PREFIX_PATH "${QT_PREFIX}")
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-add_executable(${APP_NAME} main.cpp)
+if(APPLE)
+    add_executable(${APP_NAME} MACOSX_BUNDLE main.cpp)
+else()
+    add_executable(${APP_NAME} main.cpp)
+endif()
 target_link_libraries(${APP_NAME} PRIVATE Qt6::Widgets)
 
 if(WIN32)
