@@ -8,3 +8,5 @@ aqtinstall.log
 # Visual Studio / MSVC cruft
 .vs/
 *.vcxproj.user
+.vscode/
+.idea/
